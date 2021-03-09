@@ -18,7 +18,6 @@ void Tiro::DesenhaCirc(GLint radius, GLfloat R, GLfloat G, GLfloat B)
 void Tiro::DesenhaTiro(GLfloat x, GLfloat y)
 {
     glPushMatrix();
-    std::cout << "que carlaho" << x << "," << y << std::endl;
     glTranslatef(x, y, 0);
     this->DesenhaCirc(radiusTiro, 1,1,1);
     glPopMatrix();

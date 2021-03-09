@@ -21,7 +21,8 @@ CC=gcc
 LIBS=-framework GLUT	\
 	 -framework OpenGL	\
 	 -Wno-deprecated    \
-	 -lc++
+	 -lc++				\
+	 -std=c++11
  
 #
 # Compilation and linking
