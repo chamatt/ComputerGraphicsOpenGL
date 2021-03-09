@@ -118,9 +118,11 @@ void matrixVectorMultiply(GLfloat mat1[3][3],
 
 //Funcao auxiliar de rotacao
 void RotatePoint(GLfloat x, GLfloat y, GLfloat angle, GLfloat &xOut, GLfloat &yOut){
+    GLfloat rad = angle*PI/180;
+    
     GLfloat rotationMatrix[3][3] = {
-        {cos(angle), -sin(angle), 0},
-        {sin(angle), cos(angle), 0},
+        {cos(rad), -sin(rad), 0},
+        {sin(rad), cos(rad), 0},
         {0, 0, 1}
        };
     
@@ -156,8 +158,8 @@ void RotatePoint(GLfloat x, GLfloat y, GLfloat angle, GLfloat &xOut, GLfloat &yO
     }
     std::cout << std::endl << std::endl;
     
-    xOut = res[1][0];
-    yOut = res[2][0];
+    xOut = res[0][0];
+    yOut = res[1][0];
 }
 
 Tiro* Robo::Atira()
@@ -166,23 +168,26 @@ Tiro* Robo::Atira()
 
     GLfloat baseX, baseY, tipX, tipY;
 
-    y += baseHeight;
-
-    RotatePoint(x, y, (GLfloat) -gTheta1, x, y);
-
+    y += paddleHeight;
+    
+    RotatePoint(x, y, -gTheta1, x, y);
+    
     y += paddleHeight;
 
-    RotatePoint(x, y, (GLfloat) -gTheta2, x, y);
-
-    baseX = x + gX; baseY = y + gY;
-
+    RotatePoint(x, y, -gTheta2, x, y);
+    
+    baseX = x + gX;
+    baseY = y + gY + baseHeight;
+    
     y += paddleHeight;
-
-    RotatePoint(x, y, (GLfloat) -gTheta3, x, y);
-
-    tipX = x + gX; tipY = y + gY;
+    
+    RotatePoint(x, y, -gTheta3, x, y);
+    
+    tipX = x + gX;
+    tipY = y + gY + baseHeight;
+    
 
     GLfloat angle = atan2(tipX-baseX, tipY-baseY);
     
-    return new Tiro(x, y, angle);
+    return new Tiro(tipX,tipY, angle);
 }
