@@ -25,8 +25,8 @@ void Tiro::DesenhaTiro(GLfloat x, GLfloat y)
 
 void Tiro::Move()
 {
-    GLfloat dx = sin(gDirectionAng) * gVel;
-    GLfloat dy = cos(gDirectionAng) * gVel;
+    GLfloat dx = cos(gDirectionAng*3.14/180) * gVel;
+    GLfloat dy = sin(gDirectionAng*3.14/180) * gVel;
     
     gX += dx;
     gY += dy;

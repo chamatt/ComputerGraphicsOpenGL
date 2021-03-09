@@ -239,8 +239,8 @@ Tiro* Robo::Atira()
     translate2d(identity, 0, paddleHeight);
     rotate2d(identity, gTheta2);
     translate2d(identity, 0, paddleHeight);
-    rotate2d(identity, gTheta3);
     matrixVectorMultiply(identity, base, base);
+    rotate2d(identity, gTheta3);
     translate2d(identity, 0, paddleHeight);
     matrixVectorMultiply(identity, tip, tip);
     
@@ -295,7 +295,9 @@ Tiro* Robo::Atira()
 //
 //    tipX = x + gX; tipY = y + gY + baseHeight;
 //
-    GLfloat angle = atan2(tip[0][0]-tip[0][0], tip[1][0]-tip[1][0]);
+    GLfloat angle = atan2(tip[1][0] - base[1][0], tip[0][0] - base[0][0]);
     
-    return new Tiro(tip[0][0],tip[1][0], angle);
+    cout <<tip[1][0] - base[1][0] << "," << tip[0][0] - base[0][0] << ": " << (angle*180)/PI << endl;
+    
+    return new Tiro(tip[0][0], tip[1][0], (angle*180)/PI);
 }
