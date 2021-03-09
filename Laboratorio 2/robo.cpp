@@ -18,14 +18,23 @@ void Robo::DesenhaRect(GLint height, GLint width, GLfloat R, GLfloat G, GLfloat 
 
 void Robo::DesenhaCirc(GLint radius, GLfloat R, GLfloat G, GLfloat B)
 {
+//    glPointSize(2);
+//    glColor3f(R, G, B);
+//    for(int i = 0; i < 360/20; i++) {
+//        glRotatef(20, 0, 0, 1);
+//        glBegin(GL_POINTS);
+//        glVertex2f(radius, 0);
+//        glEnd();
+//    }
     glPointSize(2);
+    float theta;
     glColor3f(R, G, B);
-    for(int i = 0; i < 360/20; i++) {
-        glRotatef(20, 0, 0, 1);
-        glBegin(GL_POINTS);
-        glVertex2f(radius, 0);
-        glEnd();
-    }
+    glBegin(GL_POINTS);
+        for(int i = 0; i < 360/20; i++) {
+            theta = i*20*3.14/180;
+            glVertex2f(radius*cos(theta), radius*sin(theta));
+        }
+    glEnd();
 }
 
 void Robo::DesenhaRoda(GLfloat x, GLfloat y, GLfloat thetaWheel, GLfloat R, GLfloat G, GLfloat B)
@@ -93,12 +102,87 @@ void Robo::MoveEmX(GLfloat dx)
     this->gThetaWheel += deltaTheta;
 }
 
+void matrixVectorMultiply(GLfloat mat1[3][3],
+              GLfloat mat2[3][1],
+              GLfloat res[3][1])
+{
+    int i, j, k;
+    for (i = 0; i < 3; i++) {
+        for (j = 0; j < 1; j++) {
+            res[i][j] = 0;
+            for (k = 0; k < 3; k++)
+                res[i][j] += mat1[i][k] * mat2[k][j];
+        }
+    }
+}
+
 //Funcao auxiliar de rotacao
 void RotatePoint(GLfloat x, GLfloat y, GLfloat angle, GLfloat &xOut, GLfloat &yOut){
+    GLfloat rotationMatrix[3][3] = {
+        {cos(angle), -sin(angle), 0},
+        {sin(angle), cos(angle), 0},
+        {0, 0, 1}
+       };
     
+    GLfloat vet[3][1] = {
+        {x},
+        {y},
+        {1}
+    };
+    
+    GLfloat res[3][1];
+    
+    matrixVectorMultiply(rotationMatrix, vet, res);
+    
+    std::cout << "RotationMatrix" << std::endl;
+    for(int i = 0; i < 3; i++){
+        for(int j = 0; j < 3; j++)
+            std::cout << rotationMatrix[i][j] << ", ";
+        std::cout << std::endl;
+    }
+    std::cout << std::endl << std::endl;
+    
+    std::cout << "Point" << std::endl;
+    for(int i = 0; i < 3; i++){
+            std::cout << vet[i][0] << ", ";
+        std::cout << std::endl;
+    }
+    std::cout << std::endl << std::endl;
+    
+    std::cout << "Result:" << std::endl;
+    for(int i = 0; i < 3; i++){
+            std::cout << res[i][0] << ", ";
+        std::cout << std::endl;
+    }
+    std::cout << std::endl << std::endl;
+    
+    xOut = res[1][0];
+    yOut = res[2][0];
 }
 
 Tiro* Robo::Atira()
 {
+    GLfloat x = 0, y = 0;
 
+    GLfloat baseX, baseY, tipX, tipY;
+
+    y += baseHeight;
+
+    RotatePoint(x, y, (GLfloat) -gTheta1, x, y);
+
+    y += paddleHeight;
+
+    RotatePoint(x, y, (GLfloat) -gTheta2, x, y);
+
+    baseX = x + gX; baseY = y + gY;
+
+    y += paddleHeight;
+
+    RotatePoint(x, y, (GLfloat) -gTheta3, x, y);
+
+    tipX = x + gX; tipY = y + gY;
+
+    GLfloat angle = atan2(tipX-baseX, tipY-baseY);
+    
+    return new Tiro(x, y, angle);
 }
