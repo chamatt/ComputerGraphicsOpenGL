@@ -31,7 +31,7 @@ public:
         gX = x; 
         gY = y; 
         gDirectionAng = directionAng; 
-        gVel = 0.1;
+        gVel = 10;
     };
     void Desenha(){ 
         DesenhaTiro(gX, gY);

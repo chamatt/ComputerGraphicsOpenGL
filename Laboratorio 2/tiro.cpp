@@ -3,6 +3,8 @@
 #include <iostream>
 #define DISTANCIA_MAX 500
 
+using namespace std;
+
 void Tiro::DesenhaCirc(GLint radius, GLfloat R, GLfloat G, GLfloat B)
 {
         float theta;
@@ -37,7 +39,10 @@ bool Tiro::Valido()
     GLfloat xDist = abs(gXInit - gX);
     GLfloat yDist = abs(gYInit - gY);
     
-    GLfloat distancia = sqrt(pow(xDist, 2) * pow(yDist, 2));
+    GLfloat distancia = sqrt(pow(xDist, 2) + pow(yDist, 2));
+    cout << "aaaaa" << distancia << endl;
+    
+    
     
     return distancia <= DISTANCIA_MAX;
 }
