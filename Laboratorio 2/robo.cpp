@@ -107,197 +107,161 @@ void Robo::MoveEmX(GLfloat dx)
 
 
 
+class Point2D {
+    public:
+        GLfloat x;
+        GLfloat y;
 
-void matrixMultiply(vector< vector<GLfloat> > mat1,
-              vector< vector<GLfloat> > mat2,
-              vector< vector<GLfloat> > &res)
-{
-    int i, j, k;
-    for (i = 0; i < 3; i++) {
-        for (j = 0; j < 3; j++) {
-            res[i][j] = 0;
-            for (k = 0; k < 3; k++)
-                res[i][j] += mat1[i][k] * mat2[k][j];
-        }
-    }
-}
+        Point2D(GLfloat x, GLfloat y){
+            this->x = x;
+            this->y = y;
+        };
+};
 
-void matrixVectorMultiply(vector< vector<GLfloat> > mat1,
-                          vector< vector<GLfloat> > vet1,
-                          vector< vector<GLfloat> > &res)
-{
-    int i, j, k;
-    for (i = 0; i < 3; i++) {
-        for (j = 0; j < 1; j++) {
-            res[i][j] = 0;
-            for (k = 0; k < 3; k++){
-                cout << i << "," << j << ": " << res[i][j] << " += " << mat1[i][k] << " " << vet1[k][j] << endl;
-                res[i][j] += mat1[i][k] * vet1[k][j];
+class Transformation {
+    private:
+        bool shouldLog = false;
+        
+        void log() {
+            if(shouldLog) {
+                cout << "Matrix:" << endl;
+                for(auto c : this->matrix) {
+                    for(auto b : c) {
+                        cout << b << ",";
+                    }
+                    cout << endl;
+                }
+                cout << endl;
             }
         }
+        
+        void logTranslate(GLfloat x, GLfloat y) {
+            if(shouldLog){
+                cout << "Translate: " << x << ", " << y << endl;
+                this->log();
+            }
+        }
+    
+        void logRotate(GLfloat angle) {
+            if(shouldLog){
+                cout << "Rotate: " << angle << endl;
+                this->log();
+            }
+        }
+            
+    
+        void matrixMultiply(vector< vector<GLfloat> > mat2)
+        {
+            vector< vector<GLfloat> > mat1 = this->matrix;
+            
+            int i, j, k;
+            for (i = 0; i < 3; i++) {
+                for (j = 0; j < 3; j++) {
+                    this->matrix[i][j] = 0;
+                    for (k = 0; k < 3; k++)
+                        this->matrix[i][j] += mat1[i][k] * mat2[k][j];
+                }
+            }
+            
+           
+        }
+
+        void matrixVectorMultiply(vector< vector<GLfloat> > vet1,
+                                  vector< vector<GLfloat> > &res)
+        {
+            int i, j, k;
+            for (i = 0; i < 3; i++) {
+                for (j = 0; j < 1; j++) {
+                    res[i][j] = 0;
+                    for (k = 0; k < 3; k++){
+                        res[i][j] += this->matrix[i][k] * vet1[k][j];
+                    }
+                }
+            }
+        }
+
+    public:
+        vector< vector<GLfloat> > matrix;
+
+        vector< vector<GLfloat> > getIdentity() {
+            vector< vector<GLfloat> > identity = {
+                {1,0,0},
+                {0,1,0},
+                {0,0,1}
+            };
+
+            return identity;
+        }
+
+        Transformation(){
+            this->matrix = this->getIdentity();
+            this->log();
+        };
+
+        void translate2d(GLfloat x, GLfloat y) {
+            vector< vector<GLfloat> > translateMatrix = {
+                {1, 0, x},
+                {0, 1, y},
+                {0, 0, 1}
+            };
+            matrixMultiply(translateMatrix);
+            this->logTranslate(x, y);
+        }
+
+        void rotate2d(GLfloat angle) {
+            GLfloat rad = angle*PI/180;
+            vector< vector<GLfloat> > rotationMatrix = {
+                {cos(rad), -sin(rad), 0},
+                {sin(rad), cos(rad), 0},
+                {0, 0, 1}
+            };
+            matrixMultiply(rotationMatrix);
+            this->logRotate(angle);
+        }
+
+        void apply(Point2D* point) {
+            vector< vector<GLfloat> > vet = {
+                {point->x},
+                {point->y},
+                {1}
+            };
+            
+            matrixVectorMultiply(vet, vet);
+
+            point->x =vet[0][0];
+            point->y =vet[1][0];
+        }
+    
+    void logMode(bool state) {
+        this->shouldLog = state;
     }
-}
+};
 
-void rotate2d(vector< vector<GLfloat> > &mat1, GLfloat angle) {
-    GLfloat rad = angle*PI/180;
-    vector< vector<GLfloat> > rotationMatrix = {
-        {cos(rad), -sin(rad), 0},
-        {sin(rad), cos(rad), 0},
-        {0, 0, 1}
-    };
-    matrixMultiply(mat1, rotationMatrix, mat1);
-}
 
-void translate2d(vector< vector<GLfloat> > &mat1, GLfloat x, GLfloat y) {
-    vector< vector<GLfloat> > translateMatrix = {
-        {1, 0, x},
-        {0, 1, y},
-        {0, 0, 1}
-    };
-    matrixMultiply(mat1, translateMatrix, mat1);
-}
-
-////Funcao auxiliar de rotacao
-//void RotatePoint(GLfloat x, GLfloat y, GLfloat angle, GLfloat &xOut, GLfloat &yOut){
-//    GLfloat rad = angle*PI/180;
-//
-//    vector<GLfloat> rotationMatrix = {
-//        {cos(rad), -sin(rad), 0},
-//        {sin(rad), cos(rad), 0},
-//        {0, 0, 1}
-//       };
-//
-//    vector< vector<GLfloat >> vet = {
-//        {x},
-//        {y},
-//        {1}
-//    };
-//
-//    GLfloat res[3][1];
-//
-//    matrixVectorMultiply(rotationMatrix, vet, res);
-//
-//    std::cout << "RotationMatrix" << std::endl;
-//    for(int i = 0; i < 3; i++){
-//        for(int j = 0; j < 3; j++)
-//            std::cout << rotationMatrix[i][j] << ", ";
-//        std::cout << std::endl;
-//    }
-//    std::cout << std::endl << std::endl;
-//
-//    std::cout << "Point" << std::endl;
-//    for(int i = 0; i < 3; i++){
-//            std::cout << vet[i][0] << ", ";
-//        std::cout << std::endl;
-//    }
-//    std::cout << std::endl << std::endl;
-//
-//    std::cout << "Result:" << std::endl;
-//    for(int i = 0; i < 3; i++){
-//            std::cout << res[i][0] << ", ";
-//        std::cout << std::endl;
-//    }
-//    std::cout << std::endl << std::endl;
-//
-//    xOut = res[0][0];
-//    yOut = res[1][0];
-//}
 
 Tiro* Robo::Atira()
 {
-    GLfloat x = 0, y = 0;
+    Point2D* base = new Point2D(0, 0);
+    Point2D* tip = new Point2D(0, 0);
 
+    Transformation* tr = new Transformation();
+    tr->logMode(true);
+    tr->translate2d(gX, gY);
+    tr->translate2d(0, baseHeight);
+    tr->rotate2d(gTheta1);
+    tr->translate2d(0, paddleHeight);
+    tr->rotate2d(gTheta2);
+    tr->translate2d(0, paddleHeight);
+    tr->apply(base);
     
-    vector< vector<GLfloat> > identity = {
-        {1,0,0},
-        {0,1,0},
-        {0,0,1}
-    };
+    tr->rotate2d(gTheta3);
+    tr->translate2d(0, paddleHeight);
+    tr->apply(tip);
     
-    vector< vector<GLfloat> > base = {
-        {0},
-        {0},
-        {1}
-    };
-    
-    vector< vector<GLfloat> > tip = {
-        {0},
-        {0},
-        {1}
-    };
-    
-    std::cout << "Point Before" << std::endl;
-    for(int i = 0; i < 2; i++){
-            std::cout << tip[i][0] << ", ";
-        std::cout << std::endl;
-    }
-    std::cout << std::endl << std::endl;
-    
-    translate2d(identity, gX, gY);
-    translate2d(identity, 0, baseHeight);
-    rotate2d(identity, gTheta1);
-    translate2d(identity, 0, paddleHeight);
-    rotate2d(identity, gTheta2);
-    translate2d(identity, 0, paddleHeight);
-    matrixVectorMultiply(identity, base, base);
-    rotate2d(identity, gTheta3);
-    translate2d(identity, 0, paddleHeight);
-    matrixVectorMultiply(identity, tip, tip);
-    
-//
-//    std::cout << "Identify" << std::endl;
-//    for(int i = 0; i < 3; i++){
-//        for(int j = 0; j < 3; j++)
-//            std::cout << identity[i][j] << ", ";
-//        std::cout << std::endl;
-//    }
-//    std::cout << std::endl << std::endl;
-//
-//    matrixVectorMultiply(identity, res, res);
-//
-//    std::cout << "Point After" << std::endl;
-//    for(int i = 0; i < 2; i++){
-//            std::cout << res[i][0] << ", ";
-//        std::cout << std::endl;
-//    }
-//    std::cout << std::endl << std::endl;
+    GLfloat angle = atan2(tip->y - base->y, tip->x - base->x);
+    GLfloat rad = (angle*180)/PI;
 
-    
-//    GLfloat baseX, baseY, tipX, tipY;
-//
-//    y += paddleHeight;
-//
-//    RotatePoint(x, y, -gTheta1, x, y);
-//
-//    y += paddleHeight;
-//
-//    RotatePoint(x, y, -gTheta2, x, y);
-//
-//    baseX = gX - x;
-//    baseY = y + gY + baseHeight;
-//
-//    y += paddleHeight;
-//
-//    RotatePoint(x, y, - gTheta3, x, y);
-//
-//
-//    tipX = gX - x;
-//    tipY = y + gY + baseHeight;
-//
-//
-//
-//
-//
-////
-////    baseX = x + gX; baseY = y + gY + baseHeight;
-////
-//
-//
-//    tipX = x + gX; tipY = y + gY + baseHeight;
-//
-    GLfloat angle = atan2(tip[1][0] - base[1][0], tip[0][0] - base[0][0]);
-    
-    cout <<tip[1][0] - base[1][0] << "," << tip[0][0] - base[0][0] << ": " << (angle*180)/PI << endl;
-    
-    return new Tiro(tip[0][0], tip[1][0], (angle*180)/PI);
+    cout << tip->y - base->y << "," << tip->x - base->x << ": " << rad << endl;
+
+    return new Tiro(tip->x, tip->y, rad);
 }

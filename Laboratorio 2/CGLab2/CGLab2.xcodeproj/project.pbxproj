@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		9019D8C225FA0E5A0044E113 /* framework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = framework.h; path = ../framework.h; sourceTree = "<group>"; };
 		90AC5CA025F754C100200ED8 /* tiro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tiro.cpp; path = ../tiro.cpp; sourceTree = "<group>"; };
 		90AC5CA125F754C100200ED8 /* tiro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tiro.h; path = ../tiro.h; sourceTree = "<group>"; };
 		90AC5CA225F754C100200ED8 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../main.cpp; sourceTree = "<group>"; };
@@ -35,6 +36,7 @@
 				90AC5CAD25F754C200200ED8 /* teste */,
 				90AC5CA025F754C100200ED8 /* tiro.cpp */,
 				90AC5CA125F754C100200ED8 /* tiro.h */,
+				9019D8C225FA0E5A0044E113 /* framework.h */,
 			);
 			sourceTree = "<group>";
 		};

@@ -11,6 +11,7 @@
 #ifndef ROBO_H
 #define	ROBO_H
 #include "tiro.h"
+#include "framework.h"
 // Dimensions
 #define paddleHeight 80
 #define paddleWidth 10
