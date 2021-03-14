@@ -5,7 +5,9 @@
 #define PI 3.14
 
 using namespace std;
-
+void initFramework() {
+    srand (static_cast <unsigned> (time(0)));
+}
 
 void Transformation::log(){
     if(shouldLog) {

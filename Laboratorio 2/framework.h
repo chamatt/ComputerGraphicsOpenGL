@@ -18,6 +18,23 @@
 
 using namespace std;
 
+void initFramework();
+
+class Random {
+    public:
+        GLfloat number;
+        
+        Random() {
+            this->number = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        }
+        Random(GLfloat X) {
+            this->number = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/X));
+        }
+        Random(GLfloat LO, GLfloat HI) {
+            this->number = LO + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(HI-LO)));
+        }
+};
+
 class Point2D {
     public:
         GLfloat x;
@@ -27,6 +44,10 @@ class Point2D {
             this->x = x;
             this->y = y;
         };
+    
+        GLfloat distanceTo(Point2D* another) {
+            return sqrt(pow(this->x - another->x, 2) + pow(this->y - another->y, 2));
+        }
 };
 
 class Transformation {

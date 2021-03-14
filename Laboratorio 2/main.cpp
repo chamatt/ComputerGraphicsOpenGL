@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include "robo.h"
 #include "alvo.h"
+#include "framework.h"
 //#define INC_KEY 1
 //#define INC_KEYIDLE 0.01
 #define INC_KEY 5
@@ -39,6 +40,25 @@ Robo robo; //Um rodo
 Tiro * tiro = NULL; //Um tiro por vez
 Alvo alvo(0, 200); //Um alvo por vez
 
+int atingido = 0;
+static char str[1000];
+void * font = GLUT_BITMAP_9_BY_15;
+void ImprimePlacar(GLfloat x, GLfloat y)
+{
+    glColor3f(1.0, 1.0, 1.0);
+    //Cria a string a ser impressa
+    char *tmpStr;
+    sprintf(str, "Atingido: %d", atingido );
+    //Define a posicao onde vai comecar a imprimir
+    glRasterPos2f(x, y);
+    //Imprime um caractere por vez
+    tmpStr = str;
+    while( *tmpStr ){
+        glutBitmapCharacter(font, *tmpStr);
+        tmpStr++;
+    }
+}
+
 void renderScene(void)
 {
      // Clear the screen.
@@ -49,9 +69,13 @@ void renderScene(void)
      if (tiro) tiro->Desenha();
      
      alvo.Desenha();
+    
+     ImprimePlacar(-ViewingWidth/2 + 20, -ViewingHeight/2 + 20);
 
      glutSwapBuffers(); // Desenha the new frame of the game.
 }
+
+
 
 void keyPress(unsigned char key, int x, int y)
 {
@@ -134,26 +158,46 @@ void init(void)
       
 }
 
+
+GLdouble currentTime, timeDiference;
+
+GLfloat moveByTime(GLfloat amount) {
+    return amount * (timeDiference/20);
+}
+
 void idle(void)
 {
+    static GLdouble previousTime = glutGet(GLUT_ELAPSED_TIME);
+//    GLdouble currentTime, timeDiference;
+    //Pega o tempo que passou do inicio da aplicacao
+    currentTime = glutGet(GLUT_ELAPSED_TIME);
+    // Calcula o tempo decorrido desde de a ultima frame.
+    timeDiference = currentTime - previousTime;
+    //Atualiza o tempo do ultimo frame ocorrido
+    previousTime = currentTime;
+    
+    
+    
+//    for(int i = 0; i < 90000000; i++);
     double inc = INC_KEYIDLE;
     //Treat keyPress
     if(keyStatus[(int)('a')])
     {
-        robo.MoveEmX(-inc);
+        robo.MoveEmX(moveByTime(-inc));
     }
     if(keyStatus[(int)('d')])
     {
-        robo.MoveEmX(inc);
+        robo.MoveEmX(moveByTime(inc));
     }
     
     //Trata o tiro (soh permite um tiro por vez)
     //Poderia usar uma lista para tratar varios tiros
     if(tiro){
-        tiro->Move();
+        tiro->Move(timeDiference/100);
 
         //Trata colisao
         if (alvo.Atingido(tiro)){
+            atingido++;
             alvo.Recria(rand()%500 - 250, 200);
         }
 
@@ -173,7 +217,7 @@ void idle(void)
         else if (robo.ObtemX() < -(ViewingWidth/2)){
             dir *= -1;
         }
-        robo.MoveEmX(dir*INC_KEYIDLE);
+        robo.MoveEmX(moveByTime(dir*INC_KEYIDLE));
     }
     
     glutPostRedisplay();
@@ -181,6 +225,7 @@ void idle(void)
  
 int main(int argc, char *argv[])
 {
+    initFramework();
     // Initialize openGL with Double buffer and RGB color without transparency.
     // Its interesting to try GLUT_SINGLE instead of GLUT_DOUBLE.
     glutInit(&argc, argv);

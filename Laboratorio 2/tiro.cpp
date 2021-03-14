@@ -25,13 +25,13 @@ void Tiro::DesenhaTiro(GLfloat x, GLfloat y)
     glPopMatrix();
 }
 
-void Tiro::Move()
+void Tiro::Move(GLfloat timeDifference)
 {
     GLfloat dx = cos(gDirectionAng*3.14/180) * gVel;
     GLfloat dy = sin(gDirectionAng*3.14/180) * gVel;
     
-    gX += dx;
-    gY += dy;
+    gX += dx * timeDifference;
+    gY += dy * timeDifference;
 }
 
 bool Tiro::Valido()
@@ -40,9 +40,6 @@ bool Tiro::Valido()
     GLfloat yDist = abs(gYInit - gY);
     
     GLfloat distancia = sqrt(pow(xDist, 2) + pow(yDist, 2));
-    cout << "aaaaa" << distancia << endl;
-    
-    
     
     return distancia <= DISTANCIA_MAX;
 }
